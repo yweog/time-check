@@ -74,6 +74,23 @@
         .results p {
             margin: 5px 0;
             font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -143,10 +160,30 @@
                 const formatter = new Intl.DateTimeFormat('en-US', options);
                 const convertedTime = formatter.format(utcDate);
 
-                // Display the result for each time zone
+                // Create a paragraph element for the result
                 const timeZoneResult = document.createElement("p");
                 timeZoneResult.textContent = `${timeZone}: ${convertedTime}`;
+
+                // Add a copy button
+                const copyButton = document.createElement("button");
+                copyButton.className = "copy-btn";
+                copyButton.textContent = "Copy";
+                copyButton.onclick = () => copyToClipboard(`${timeZone}: ${convertedTime}`);
+
+                // Append the button to the paragraph
+                timeZoneResult.appendChild(copyButton);
+
+                // Append the paragraph to the results div
                 resultsDiv.appendChild(timeZoneResult);
+            });
+        }
+
+        // Function to copy text to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`Copied to clipboard: ${text}`);
+            }).catch(err => {
+                console.error("Failed to copy text: ", err);
             });
         }
     </script>
