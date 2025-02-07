@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Zone Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #003366;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input[type="datetime-local"], select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #002244;
+        }
+
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .results p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Time Zone Converter</h1>
+    </header>
+
+    <div class="container">
+        <h2>Convert Time Across Time Zones</h2>
+
+        <label for="inputDateTime">Enter Date and Time:</label>
+        <input type="datetime-local" id="inputDateTime" required>
+
+        <label for="inputTimeZone">Select Input Time Zone:</label>
+        <select id="inputTimeZone" required>
+            <option value="America/New_York">New York (EST)</option>
+            <option value="Europe/London">London (GMT)</option>
+            <option value="Asia/Tokyo">Tokyo (JST)</option>
+            <option value="Australia/Sydney">Sydney (AEDT)</option>
+            <option value="America/Los_Angeles">Los Angeles (PST)</option>
+            <option value="Asia/Dubai">Dubai (GST)</option>
+            <option value="Asia/Kolkata">Kolkata (IST)</option>
+            <option value="Africa/Johannesburg">Johannesburg (SAST)</option>
+            <option value="Pacific/Auckland">Auckland (NZDT)</option>
+        </select>
+
+        <button onclick="convertTime()">Convert</button>
+
+        <div class="results" id="results">
+            <!-- Converted times will appear here -->
+        </div>
+    </div>
+
+    <script>
+        function convertTime() {
+            // Get the input date and time from the user
+            const inputDateTime = document.getElementById("inputDateTime").value;
+            const inputTimeZone = document.getElementById("inputTimeZone").value;
+
+            // Combine the input date-time with the input time zone
+            const dateTimeString = `${inputDateTime} ${inputTimeZone}`;
+            const options = { timeZone: inputTimeZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const formatter = new Intl.DateTimeFormat('en-US', options);
+            const parts = formatter.formatToParts(new Date(dateTimeString));
+            
+            // Reconstruct the date in UTC for conversion purposes
+            const utcDate = new Date(
+                `${parts.find(part => part.type === 'year').value}-${parts.find(part => part.type === 'month').value}-${parts.find(part => part.type === 'day').value}T${parts.find(part => part.type === 'hour').value}:${parts.find(part => part.type === 'minute').value}:${parts.find(part => part.type === 'second').value}Z`
+            );
+
+            // Define the target time zones
+            const timeZones = [
+                "America/New_York", 
+                "Europe/London", 
+                "Asia/Tokyo", 
+                "Australia/Sydney", 
+                "Asia/Dubai"
+            ];
+
+            // Convert the input date and time to each target time zone
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = ""; // Clear previous results
+
+            timeZones.forEach(timeZone => {
+                const options = { timeZone: timeZone, year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                const formatter = new Intl.DateTimeFormat('en-US', options);
+                const convertedTime = formatter.format(utcDate);
+
+                // Display the result for each time zone
+                const timeZoneResult = document.createElement("p");
+                timeZoneResult.textContent = `${timeZone}: ${convertedTime}`;
+                resultsDiv.appendChild(timeZoneResult);
+            });
+        }
+    </script>
+</body>
+</html>
