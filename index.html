@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,194 +6,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time Zone Converter</title>
     <style>
-        /* Inline CSS for styling */
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
+            margin: 20px;
         }
-
-        header {
-            background-color: #003366;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
         .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
         }
-
-        h2 {
-            color: #003366;
-            text-align: center;
-        }
-
         label {
             display: block;
             margin-top: 15px;
-            font-weight: bold;
         }
-
-        input[type="datetime-local"], select {
+        select, input, button {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            box-sizing: border-box;
         }
-
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #003366;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #002244;
-        }
-
-        .results {
+        .output {
             margin-top: 20px;
-            padding: 15px;
-            background-color: #f0f8ff;
+            padding: 10px;
+            background-color: #f9f9f9;
             border: 1px solid #ddd;
-            border-radius: 4px;
         }
-
-        .results p {
-            margin: 5px 0;
-            font-size: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
         .copy-btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .copy-btn:hover {
-            background-color: #0056b3;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- Header Section -->
-    <header>
-        <h1>Time Zone Converter</h1>
-    </header>
+<div class="container">
+    <h1>Time Zone Converter</h1>
+    <label for="input-date">Enter Date and Time:</label>
+    <input type="datetime-local" id="input-date" required>
 
-    <!-- Main Content -->
-    <div class="container">
-        <h2>Convert Time Across Time Zones</h2>
+    <label for="input-timezone">Select Input Timezone:</label>
+    <select id="input-timezone">
+        <option value="America/Halifax">Halifax (AST/ADT)</option>
+        <option value="America/Chicago">Central Time (CST/CDT)</option>
+        <option value="Asia/Singapore">Singapore (SGT)</option>
+        <option value="Asia/Dubai">UAE (GST)</option>
+        <option value="Europe/London">UK (GMT/BST)</option>
+    </select>
 
-        <!-- Input Fields -->
-        <label for="inputDateTime">Enter Date and Time:</label>
-        <input type="datetime-local" id="inputDateTime" required>
+    <button onclick="convertTime()">Convert</button>
 
-        <label for="inputTimeZone">Select Input Time Zone:</label>
-        <select id="inputTimeZone" required>
-            <option value="America/New_York">New York (EST)</option>
-            <option value="Europe/London">London (GMT)</option>
-            <option value="Asia/Tokyo">Tokyo (JST)</option>
-            <option value="Australia/Sydney">Sydney (AEDT)</option>
-            <option value="America/Los_Angeles">Los Angeles (PST)</option>
-            <option value="Asia/Dubai">Dubai (GST)</option>
-            <option value="Asia/Kolkata">Kolkata (IST)</option>
-            <option value="Africa/Johannesburg">Johannesburg (SAST)</option>
-            <option value="Pacific/Auckland">Auckland (NZDT)</option>
-        </select>
-
-        <!-- Convert Button -->
-        <button onclick="convertTime()">Convert</button>
-
-        <!-- Results Section -->
-        <div class="results" id="results">
-            <!-- Converted times will appear here -->
-        </div>
+    <div class="output" id="output">
+        <strong>Converted Times:</strong><br>
+        <span id="converted-times"></span>
     </div>
 
-    <!-- Inline JavaScript -->
-    <script>
-        function convertTime() {
-            // Get the input date and time from the user
-            const inputDateTime = document.getElementById("inputDateTime").value;
-            const inputTimeZone = document.getElementById("inputTimeZone").value;
+    <button class="copy-btn" onclick="copyOutput()">Copy Output</button>
+</div>
 
-            // Combine the input date-time with the input time zone
-            const dateTimeString = `${inputDateTime} ${inputTimeZone}`;
-            const options = { timeZone: inputTimeZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+<script>
+    function convertTime() {
+        const inputDate = document.getElementById('input-date').value;
+        const inputTimezone = document.getElementById('input-timezone').value;
+        const outputDiv = document.getElementById('converted-times');
+        outputDiv.innerHTML = '';
+
+        if (!inputDate) {
+            alert('Please enter a valid date and time.');
+            return;
+        }
+
+        const targetTimezones = [
+            { name: 'Halifax', tz: 'America/Halifax' },
+            { name: 'Central Time', tz: 'America/Chicago' },
+            { name: 'Singapore', tz: 'Asia/Singapore' },
+            { name: 'UAE', tz: 'Asia/Dubai' },
+            { name: 'UK', tz: 'Europe/London' }
+        ];
+
+        const inputDateTime = new Date(inputDate + 'Z'); // Assume input is in UTC
+        const options = { timeZone: inputTimezone, year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+
+        targetTimezones.forEach(tzInfo => {
+            options.timeZone = tzInfo.tz;
             const formatter = new Intl.DateTimeFormat('en-US', options);
-            const parts = formatter.formatToParts(new Date(dateTimeString));
-            
-            // Reconstruct the date in UTC for conversion purposes
-            const utcDate = new Date(
-                `${parts.find(part => part.type === 'year').value}-${parts.find(part => part.type === 'month').value}-${parts.find(part => part.type === 'day').value}T${parts.find(part => part.type === 'hour').value}:${parts.find(part => part.type === 'minute').value}:${parts.find(part => part.type === 'second').value}Z`
-            );
+            const convertedTime = formatter.format(inputDateTime);
+            outputDiv.innerHTML += `<strong>${tzInfo.name}:</strong> ${convertedTime}<br>`;
+        });
+    }
 
-            // Define the target time zones
-            const timeZones = [
-                "America/New_York", 
-                "Europe/London", 
-                "Asia/Tokyo", 
-                "Australia/Sydney", 
-                "Asia/Dubai"
-            ];
-
-            // Convert the input date and time to each target time zone
-            const resultsDiv = document.getElementById("results");
-            resultsDiv.innerHTML = ""; // Clear previous results
-
-            timeZones.forEach(timeZone => {
-                const options = { timeZone: timeZone, year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-                const formatter = new Intl.DateTimeFormat('en-US', options);
-                const convertedTime = formatter.format(utcDate);
-
-                // Create a paragraph element for the result
-                const timeZoneResult = document.createElement("p");
-                timeZoneResult.textContent = `${timeZone}: ${convertedTime}`;
-
-                // Add a copy button
-                const copyButton = document.createElement("button");
-                copyButton.className = "copy-btn";
-                copyButton.textContent = "Copy";
-                copyButton.onclick = () => copyToClipboard(`${timeZone}: ${convertedTime}`);
-
-                // Append the button to the paragraph
-                timeZoneResult.appendChild(copyButton);
-
-                // Append the paragraph to the results div
-                resultsDiv.appendChild(timeZoneResult);
-            });
-        }
-
-        // Function to copy text to clipboard
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert(`Copied to clipboard: ${text}`);
-            }).catch(err => {
-                console.error("Failed to copy text: ", err);
-            });
-        }
-    </script>
+    function copyOutput() {
+        const outputText = document.getElementById('converted-times').innerText;
+        navigator.clipboard.writeText(outputText).then(() => {
+            alert('Output copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
+    }
+</script>
 </body>
 </html>
+```
